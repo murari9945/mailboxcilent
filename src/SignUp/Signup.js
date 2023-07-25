@@ -5,6 +5,7 @@ import {useSelector,useDispatch} from 'react-redux'
 import classes from './Sigup.module.css'
 import { authActions } from './authReducer';
 //import {AuthContext} from './AuthContext';
+import DummyPage from './Dummypage'
 
 function SignupForm() {
   const emailRef = useRef();
@@ -103,6 +104,17 @@ function SignupForm() {
           console.log('Error:', error);
         });
     }}
+    if (isLogin && isLoggedIn) {
+      // Render the dummy screen
+      return (
+        <section>
+        
+         
+         <DummyPage idToken={token}/>
+       
+        </section>
+      );
+    }
    
   return (
     <Container>
@@ -149,7 +161,7 @@ function SignupForm() {
     </section>
         </Card.Body>
       </Card>
-      {isLoggedIn && <div>Dummy Page - Welcome after successful login!</div>}
+      
     </Container>
   );
 }
