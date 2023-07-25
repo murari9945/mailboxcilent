@@ -1,12 +1,14 @@
 import logo from './logo.svg';
 import './App.css';
 import Signup from './SignUp/Signup';
+import { Provider } from 'react-redux';
+import store from './SignUp/authReducer';
 
 function App() {
   return (
-    <div className="App">
+    <Provider store={store}>
      <Signup/>
-    </div>
+    </Provider>
   );
 }
 

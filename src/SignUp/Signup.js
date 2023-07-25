@@ -1,11 +1,109 @@
 import React from 'react';
 import { Navbar, Nav, Container, Card, Form, FloatingLabel, Button } from 'react-bootstrap';
-import { useRef } from 'react';
+import { useRef,useState,useContext} from 'react';
+import {useSelector,useDispatch} from 'react-redux'
 import classes from './Sigup.module.css'
+import { authActions } from './authReducer';
+//import {AuthContext} from './AuthContext';
 
 function SignupForm() {
   const emailRef = useRef();
   const passwordRef = useRef();
+ // const emailRef = useRef();
+ // const passwordRef = useRef();
+ // const history = useHistory();
+  const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setisLoading] = useState(false);
+  const dispatch = useDispatch();
+ 
+
+
+ //const authContext = useContext(AuthContext);
+  
+
+ const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+ const token = useSelector((state) => state.auth.token);
+
+ // const newPasswordRef = useRef();
+
+  const switchAuthModeHandler = () => {
+    setIsLogin((prevState) => !prevState);
+  };
+ 
+  const submitHandler = (event) => {
+    event.preventDefault();
+    const givenEmail = emailRef.current.value;
+    const givenPassword = passwordRef.current.value;
+   
+
+    setisLoading(true);
+
+    if (isLogin) {
+      fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCGeIQdlMMvT97ANpDw1cZ8cOUqjLJp8qc', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: givenEmail,
+          password: givenPassword,
+          returnSecureToken: true,
+        }),
+        headers: {
+          'Content-type': 'application/json',
+        },
+      })
+        .then((res) => {
+          setisLoading(false);
+          if (res.ok) {
+            return res.json().then((data) => {
+              const idToken = data.idToken;
+              dispatch(authActions.login(idToken));
+              console.log(idToken);
+              //authContext.login(idToken);
+             // history.push('/add-expense');
+            });
+          } else {
+            return res.json().then((data) => {
+              let errorMessage = 'Authentication failed';
+              alert(errorMessage);
+              console.log(data);
+            });
+          }
+        })
+        .catch((error) => {
+          setisLoading(false);
+          console.log('Error:', error);
+        });
+    } else {
+      fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCGeIQdlMMvT97ANpDw1cZ8cOUqjLJp8qc', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: givenEmail,
+          password:givenPassword,
+          returnSecureToken: true,
+        }),
+        headers: {
+          'Content-type': 'application/json',
+        },
+      })
+        .then((res) => {
+          setisLoading(false);
+          if (res.ok) {
+            // Handle successful sign-up
+            //setIsAuthenticated(true);
+            
+          } else {
+            return res.json().then((data) => {
+              let errorMessage = 'Authentication failed';
+              alert(errorMessage);
+              console.log(data);
+            });
+          }
+        })
+        .catch((error) => {
+          setisLoading(false);
+          console.log('Error:', error);
+        });
+    }}
+   
   return (
     <Container>
       <Nav style={{display:'flex',flexDirection:'row',justifyContent:'center',backgroundColor:'greenyellow'}}>
@@ -42,15 +140,16 @@ function SignupForm() {
         </div>
         <div className={classes.control}>
         
-        <input type='password' id='password' required ref={passwordRef}  placeholder='CONFIRM PASSWORD'/>
+        <input type='password' id='confirmpassword' required ref={passwordRef}  placeholder='CONFIRM PASSWORD'/>
       </div>
-      <Button>SIGNUP</Button>
+      <Button onClick={submitHandler}>SIGNUP</Button>
        
       </form>
-      <Button>Have Already Account ? LOGIN</Button>  
+      <Button onClick={switchAuthModeHandler}>Have Already Account ? LOGIN</Button>  
     </section>
         </Card.Body>
       </Card>
+      {isLoggedIn && <div>Dummy Page - Welcome after successful login!</div>}
     </Container>
   );
 }
