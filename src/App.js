@@ -1,37 +1,32 @@
-import logo from './logo.svg';
+
 import './App.css';
 import Signup from './SignUp/Signup';
+
 import EmailCompose from './SignUp/EmailCompose';
-import {BrowserRouter as Router,Switch,Route, } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import store from './SignUp/authReducer';
-import { useSelector } from 'react-redux';
+import {Routes,Route,useNavigate,Navigate } from 'react-router-dom';
+import {useSelector} from 'react-redux';
+import Navbar from './SignUp/Navbar';
+import Inbox from './SignUp/Inbox';
+import Sentmail from './SignUp/Sentmail';
 
 
 function App() {
-  const isLoggedIn = useSelector((state) => state.auth.token !== null);
+  //const isLoggedIn = useSelector((state) => state.auth.token !== null);
+  //const isLoggedIn = useSelector((state) => state.auth.isAuthenticated);
+  //console.log(isLoggedIn);
+  
   return (
-   /* <Provider store={store}>
-    
-    
- <Signup/>
-  </Provider>*/
-  <Router>
-    <Switch>
-     
-      <Route path="/" exact>
-            {isLoggedIn ? (
-               (
-                // Render the add expense page if email is verified
-                <EmailCompose />
-              ) 
-            ) : (
-              <Signup/>
-            )}
-          </Route>
-        
-    </Switch>
-  </Router>
+   <div>
+    <Navbar/>
+    <Routes>
+    <Route path='/' element={<Signup/>}/>
+    <Route path="/loggedin" element={<EmailCompose/>} />
+    <Route path="/inbox" element={<Inbox/>}/>
+    <Route path="/sentmail" element ={<Sentmail/>}/>
+    </Routes>
+
+   </div>
+  
   );
 }
 

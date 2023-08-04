@@ -1,60 +1,59 @@
 import { createSlice,configureStore } from '@reduxjs/toolkit';
 
-const initialState = {
-  token: localStorage.getItem('token'),
-  isEmailVerified: false,
-};
+
+const initialAuthState = { isAuthenticated: false, isPremium: false, darkToggle:false };
 
 const authSlice = createSlice({
-  name: 'auth',
-  initialState,
+  name: "authentication",
+  initialState: initialAuthState,
   reducers: {
-    login: (state, action) => {
-      state.token = action.payload;
+    islogin(state, action) {
+      state.isAuthenticated = true;
+      localStorage.setItem("token", action.payload);
     },
-    logout: (state) => {
-      state.token = null;
+    islogout(state) {
+      state.isAuthenticated = false;
+      state.isPremium = false;
+      localStorage.removeItem("token");
     },
-   /* setEmailVerified: (state, action) => {
-      state.isEmailVerified = action.payload;
-    },*/
+    ispremium(state, action) {
+      if (action.payload > 1000 ) {
+        state.isPremium = true;
+      } else {
+        state.isPremium = false;
+      }
+    },
+    isToggle(state){
+    state.darkToggle=!state.darkToggle;
+    },
   },
 });
-/*const profileSlice = createSlice({
-    name: 'profile',
-    initialState: { showForm: false, fullName: '', profileUrl: '' },
-    reducers: {
-      updateProfile: (state, action) => {
-        // Update the profile state with the new data
-        state.fullName = action.payload.fullName;
-        state.profileUrl = action.payload.profileUrl;
-      },
-      toggleForm: (state) => {
-        // Toggle the showForm state
-        state.showForm = !state.showForm;
-      },
+const emailSlice = createSlice({
+  name: 'email',
+  initialState: {
+    sentEmails: [],
+    receivedEmails: [],
+  },
+  reducers: {
+    emailSentSuccess(state, action) {
+      state.sentEmails.push(action.payload);
     },
-  });*/
-  
- /* const themeSlice = createSlice({
-    name: 'theme',
-    initialState:null,
-    reducers: {
-      toggleTheme:  (state, action) => {
-        if (action.payload === 'dark') {
-          return 'dark';
-        } else {
-          return 'light';
-        }
-      },
+    sentEmailsFetched(state, action) {
+      state.sentEmails = action.payload;
     },
-  });*/
+    receivedEmailsFetched(state, action) {
+      state.receivedEmails = action.payload;
+    },
+  },
+});
+
   
 const store = configureStore({
-    reducer: { auth: authSlice.reducer}
+    reducer: { auth: authSlice.reducer,email:emailSlice.reducer }
   });
 
 export const authActions = authSlice.actions;
+export const emailsActions = emailSlice.actions
 //export const profileActions = profileSlice.actions;
 //export const themeActions = themeSlice.actions;
 

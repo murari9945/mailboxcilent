@@ -1,169 +1,162 @@
-import React from 'react';
-import { Navbar, Nav, Container, Card, Form, FloatingLabel, Button } from 'react-bootstrap';
-import { useRef,useState,useContext} from 'react';
-import {useSelector,useDispatch} from 'react-redux'
-import classes from './Sigup.module.css'
-import { authActions } from './authReducer';
-//import {AuthContext} from './AuthContext';
-import DummyPage from './Dummypage'
+import React, { useEffect } from "react";
+import { useState, useRef } from "react";
+import {Navigate, useNavigate} from 'react-router-dom';
 
-function SignupForm() {
-  const emailRef = useRef();
-  const passwordRef = useRef();
- // const emailRef = useRef();
- // const passwordRef = useRef();
- // const history = useHistory();
-  const [isLogin, setIsLogin] = useState(true);
-  const [isLoading, setisLoading] = useState(false);
+
+import classes from "./Sigup.module.css";
+
+import { useDispatch, useSelector, } from "react-redux";
+import { authActions } from "./authReducer";
+
+export default function AuthForm() {
+  const navigate = useNavigate();
+ //const history = useHistory();
   const dispatch = useDispatch();
- 
+  const isLoggedIn = useSelector((state) => state.auth.isAuthenticated);
 
-
- //const authContext = useContext(AuthContext);
-  
-
- const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
- const token = useSelector((state) => state.auth.token);
-
- // const newPasswordRef = useRef();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
+  const emailInputRef = useRef();
+  const passwordInputRef = useRef();
+  const confirmPasswordInputRef = useRef();
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
   };
- 
   const submitHandler = (event) => {
     event.preventDefault();
-    const givenEmail = emailRef.current.value;
-    const givenPassword = passwordRef.current.value;
-   
 
-    setisLoading(true);
+    const enteredEmail = emailInputRef.current.value;
+    // const changedemail = enteredEmail.replace("@", "").replace(".", "");
 
-    if (isLogin) {
-      fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCGeIQdlMMvT97ANpDw1cZ8cOUqjLJp8qc', {
-        method: 'POST',
+    localStorage.setItem("email", enteredEmail);
+    const enteredPassword = passwordInputRef.current.value;
+    const confirmPassword = confirmPasswordInputRef.current.value;
+    console.log(enteredEmail, enteredPassword, confirmPassword);
+
+    if (enteredPassword === confirmPassword) {
+      setIsLoading(true);
+      let url;
+      if (isLogin) {
+        url =
+          "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCGeIQdlMMvT97ANpDw1cZ8cOUqjLJp8qc";
+      } else {
+        url =
+          "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCGeIQdlMMvT97ANpDw1cZ8cOUqjLJp8qc";
+      }
+      fetch(url, {
+        method: "POST",
         body: JSON.stringify({
-          email: givenEmail,
-          password: givenPassword,
+          email: enteredEmail,
+          password: enteredPassword,
           returnSecureToken: true,
         }),
         headers: {
-          'Content-type': 'application/json',
+          "Content-Type": "application/json",
         },
       })
-        .then((res) => {
-          setisLoading(false);
-          if (res.ok) {
-            return res.json().then((data) => {
-              const idToken = data.idToken;
-              dispatch(authActions.login(idToken));
-              console.log(idToken);
-              //authContext.login(idToken);
-             // history.push('/add-expense');
-            });
+        .then((response) => {
+          setIsLoading(false);
+          if (response.ok) {
+            console.log("User Successfully Login", response);
+            return response.json();
           } else {
-            return res.json().then((data) => {
-              let errorMessage = 'Authentication failed';
-              alert(errorMessage);
-              console.log(data);
+            //The responde holds error
+            return response.json().then((data) => {
+              let errorMessage =
+                "Authentication Failed,please Check input field";
+
+              throw new Error(errorMessage);
             });
           }
         })
-        .catch((error) => {
-          setisLoading(false);
-          console.log('Error:', error);
+        .then((data) => {
+          dispatch(authActions.islogin(data.idToken));
+          console.log(isLoggedIn);
+
+          navigate("/");
+        })
+
+        .catch((err) => {
+          alert(err.message);
         });
     } else {
-      fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCGeIQdlMMvT97ANpDw1cZ8cOUqjLJp8qc', {
-        method: 'POST',
-        body: JSON.stringify({
-          email: givenEmail,
-          password:givenPassword,
-          returnSecureToken: true,
-        }),
-        headers: {
-          'Content-type': 'application/json',
-        },
-      })
-        .then((res) => {
-          setisLoading(false);
-          if (res.ok) {
-            // Handle successful sign-up
-            //setIsAuthenticated(true);
-            
-          } else {
-            return res.json().then((data) => {
-              let errorMessage = 'Authentication failed';
-              alert(errorMessage);
-              console.log(data);
-            });
-          }
+      const data = {
+        email: enteredEmail,
+        requestType: "PASSWORD_RESET",
+      };
+      fetch(
+        "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyCGeIQdlMMvT97ANpDw1cZ8cOUqjLJp8qc",
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+        }
+      )
+        .then((response) => {
+          console.log("Reset", response);
         })
         .catch((error) => {
-          setisLoading(false);
-          console.log('Error:', error);
+          console.log(error);
         });
-    }}
-    if (isLogin && isLoggedIn) {
-      // Render the dummy screen
-      return (
-        <section>
-        
-         
-         <DummyPage idToken={token}/>
-       
-        </section>
-      );
     }
-   
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      dispatch(authActions.islogin(token));
+    }
+  }, []);
+
   return (
-    <Container>
-      <Nav style={{display:'flex',flexDirection:'row',justifyContent:'center',backgroundColor:'greenyellow'}}>
-
-      <Nav.Item style={{paddingRight:'50px'}}>
-        <Nav.Link >Home</Nav.Link>
-      </Nav.Item>
-
-      <Nav.Item style={{paddingRight:'50px'}}>
-        <Nav.Link eventKey="link-1">Products</Nav.Link>
-      </Nav.Item>
-      <Nav.Item style={{paddingRight:'50px'}}>
-        <Nav.Link eventKey="link-2">About Us</Nav.Link>
-      </Nav.Item>
-      
-    </Nav>
-
-      <Card style={{ maxWidth: '300px',maxHeight:'800px', margin: '0 auto',backgroundColor:'red' }}>
-      <div className={`${classes.circleContainer}`}/>
-        <div className={`${classes.circle} ${classes.left}`} />
-        <div className={`${classes.circle} ${classes.right}`} />
-       
-        <Card.Body>
+    <div>
+      {!isLoggedIn && (
         <section className={classes.auth}>
+          <h1>{isLogin ? "Login" : "Sign Up"}</h1>
+          <form onSubmit={submitHandler}>
+            <div className={classes.control}>
+              <label htmlFor="email">Your Email</label>
+              <input type="email" id="email" ref={emailInputRef} required />
+            </div>
+            <div className={classes.control}>
+              <label htmlFor="password">Your Password</label>
+              <input
+                type="password"
+                id="password"
+                ref={passwordInputRef}
+                required
+              />
+            </div>
+            <div className={classes.control}>
+              <label htmlFor="confirmpassword">Confirm Password</label>
+              <input
+                type="password"
+                id="confirmpassword"
+                ref={confirmPasswordInputRef}
+                required
+              />
+            </div>
+
+            <div className={classes.actions}>
+              {!isLoading && (
+                <button>{isLogin ? "Login" : "Create Account"}</button>
+              )}
+              {isLoading && <p>Sending Request... </p>}
+              <button
+                type="button"
+                className={classes.toggle}
+                onClick={switchAuthModeHandler}
+              >
+                {isLogin ? "Create new account" : "Login with existing account"}
+              </button>
+            </div>
+            <div className={classes.actions}>
+              <button className={classes.forgot}>Forgot Password</button>
+            </div>
+          </form>
+        </section>
+      )}
       
-      <form>
-        <div className={classes.control}>
-          
-          <input type='email' id='email' required ref={emailRef}  placeholder='EMAIL'/>
-        </div>
-        <div className={classes.control}>
-        
-          <input type='password' id='password' required ref={passwordRef}  placeholder='PASSWORD'/>
-        </div>
-        <div className={classes.control}>
-        
-        <input type='password' id='confirmpassword' required ref={passwordRef}  placeholder='CONFIRM PASSWORD'/>
-      </div>
-      <Button onClick={submitHandler}>SIGNUP</Button>
-       
-      </form>
-      <Button onClick={switchAuthModeHandler}>Have Already Account ? LOGIN</Button>  
-    </section>
-        </Card.Body>
-      </Card>
-      
-    </Container>
+    </div>
   );
 }
-
-export default SignupForm;
