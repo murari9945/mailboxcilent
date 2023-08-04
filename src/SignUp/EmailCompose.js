@@ -55,7 +55,7 @@ export default function LoggeinPage() {
   };
 
   return (
-    <div style={{height:'35rem'}} className="max-w-7xl  mx-auto p-4 bg-gradient-to-b from-yellow-600 to-purple-800 my-6 ">
+    <div style={{height:'35rem',backgroundColor:'skyblue'}} className="max-w-7xl  mx-auto p-4 bg-gradient-to-b from-yellow-600 to-purple-800 my-6 ">
      
       <div className="mb-4">
         <label className="block text-gray-100 font-bold mb-2">

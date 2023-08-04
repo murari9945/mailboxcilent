@@ -5,11 +5,11 @@
     align-items: center;
     width: 200px;
     height: 100vh;
-    background-color: #f3f4f6;
+    background-color: #3055a0;
   }
   
   .nav-item {
-    padding: 10px;
+    padding: 50px;
     margin: 5px;
     border-radius: 5px;
     background-color: #ffffff;
@@ -21,14 +21,14 @@
   }
   .logo {
     font-size: 24px;
-  background: linear-gradient(to right, #fc0707, #f2ea0a); /* Replace with your desired gradient colors */
+  background: linear-gradient(to right, #0f80cc, #116feb); /* Replace with your desired gradient colors */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   transition: color 0.3s;
   }
   .logo:hover {
     font-size: 24px;
-  background: linear-gradient(to right,#f2ea0a, #fc0707); /* Replace with your desired gradient colors */
+  background: linear-gradient(to right,#106fed, #1347e3); /* Replace with your desired gradient colors */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   transition: color 0.3s;

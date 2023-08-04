@@ -43,9 +43,9 @@ export default function Navbar() {
             <NavLink
               to="/"
               className="mr-8 text-gray-100 font-bold"
-              activeClassName="text-blue-500"
+              activeClassName="text-blue-1000 bg-sky-100 border-dotted border-2 border-blue-500"
             >
-              Login
+              LOGIN
             </NavLink>
           )}
           {isLoggedIn && (
