@@ -78,15 +78,15 @@ export default function Inbox() {
   // const counter = isVisible.filter((visible) => visible).length;
 
   return (
-    <div className="inbox-container">
+    <div className="inbox-container p-6 bg-white rounded-lg shadow-md">
       {/* <p>Unread Messages: {counter}</p> */}
       {emails.map((email, index) => (
         <div
           key={email.id}
-          className={`email-item ${expandedEmailId === email.id ? 'expanded' : ''}`}
+          className={`email-item border-b py-3 ${expandedEmailId === email.id ? 'expanded' : ''}`}
           onClick={() => toggleEmail(email.id)}
         >
-          <div className="email-header" onClick={() => hideBtnHandler(index)}>
+          <div className="email-header flex items-center justify-between" onClick={() => hideBtnHandler(index)}>
             {/* {isVisible[index] && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
