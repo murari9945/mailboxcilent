@@ -12,7 +12,7 @@ body {
       width: 95%;
       max-width: 45rem;
       border-radius: 6px;
-      background: linear-gradient(to bottom, #47c2ff, #84d13b);
+      background: linear-gradient(to bottom, #47c2ff, #007bef);
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
       padding: 1rem;
       text-align: center;
@@ -63,7 +63,7 @@ body {
       cursor: pointer;
       font: inherit;
       color: white;
-      background-color: #da0000;
+      background-color: #1943eb;
       border: 2px solid #fcfcfc;
       border-radius: 10px;
       padding: 0.5rem 2.5rem;

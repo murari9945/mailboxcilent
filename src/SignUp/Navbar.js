@@ -34,7 +34,7 @@ export default function Navbar() {
             className="mr-8 text-gray-100 font-bold"
             onClick={toggleSidebar}
           >
-        
+        <FiMenu/>
           </button>
           {/* Add Logo for mailbox here */}
           <span className="mr-8 text-gray-100 font-bold logo">MAILBOX</span>
